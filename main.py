@@ -1,22 +1,19 @@
-class Recipe:
-    def __init__(self) -> None:
-        pass
+from classes.recipe import Recipe
+from classes.ingredient import Ingredient
 
-    def read_recipe():
-        return 
+def main() -> None:
+    spag = Ingredient("spag", 1)
+    spag.set_weight(100)
+
+    bol = Ingredient("bol")
+    bol.set_weight(50)
+
+    ingredients = [spag, bol]
+
+    spag_bol = Recipe(name="spag bol", time="10mins", ingredients=ingredients)
+
+    print(spag_bol)
 
 
-class Kitchen:
-    def __init__(self) -> None:
-        pass
-def load_stock():
-    return 
-
-
-
-
-def main():
-    return print("test")
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
