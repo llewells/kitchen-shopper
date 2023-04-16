@@ -11,7 +11,7 @@
   </ul>
 
   <h2>Add Ingredient</h2>
-  <form method="POST" action="{{ url_for('add_ingredient') }}">
+  <form method="POST" action="{{ url_for('get_ingredient') }}">
     {{ form.csrf_token }}
     {{ form.name.label }} {{ form.name }}
     {{ form.size.label }} {{ form.size }}
