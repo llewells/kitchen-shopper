@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create Recipe</title>
+</head>
+
+<body>
+    <h1>Create Recipe</h1>
+    <form method="POST" action="{{ url_for('create_recipe') }}">
+        {{ csrf_token() }}
+        <label for="name">Recipe Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="instructions">Instructions:</label>
+        <textarea id="instructions" name="instructions" required></textarea>
+        <br>
+        <label for="ingredients">Ingredients:</label>
+        <select id="ingredients" name="ingredients[]" multiple required>
+            {% for ingredient in ingredients %}
+            <option value="{{ ingredient.id }}">{{ ingredient.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="new_ingredient_name">New Ingredient:</label>
+        <input type="text" id="new_ingredient_name" name="new_ingredient_name">
+        <br>
+        <label for="new_ingredient_size">Ingredient Size:</label>
+        <input type="text" id="new_ingredient_size" name="new_ingredient_size">
+        <br>
+        <button type="submit">Create Recipe</button>
+    </form>
+    <a href="{{ url_for('create_ingredient') }}">Create a new ingredient</a>
+</body>
+
+</html>

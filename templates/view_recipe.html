@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ recipe.name }}</h1>
+  <p><strong>Instructions:</strong></p>
+  <ul>
+    {% for instruction in recipe.instructions %}
+      <li>{{ instruction }}</li>
+    {% endfor %}
+  </ul>
+
+  <p><strong>Ingredients:</strong></p>
+  <ul>
+    {% for recipe_ingredient in recipe.recipe_ingredients %}
+      <li>{{ recipe_ingredient.ingredient.name }} - {{ recipe_ingredient.size }}</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}">Edit Recipe</a>
+{% endblock %}
