@@ -23,7 +23,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{{ url_for('create_recipe') }}">Create Recipe</a>
-              <a class="dropdown-item" href="{{ url_for('view_all_recipes') }}">View All Recipes</a>
+              <a class="dropdown-item" href="{{ url_for('get_all_recipes') }}">View All Recipes</a>
             </div>
           </li>
           <li class="nav-item dropdown">
@@ -32,7 +32,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{{ url_for('create_ingredient') }}">Create Ingredient</a>
-              <a class="dropdown-item" href="{{ url_for('view_all_ingredients') }}">View All Ingredients</a>
+              <a class="dropdown-item" href="{{ url_for('get_all_ingredients') }}">View All Ingredients</a>
             </div>
           </li>
         </ul>

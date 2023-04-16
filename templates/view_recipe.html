@@ -17,4 +17,16 @@
   </ul>
 
   <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}">Edit Recipe</a>
+
+  <h2>Add Ingredient</h2>
+  <form method="POST" action="{{ url_for('add_ingredient', recipe_id=recipe.id) }}">
+    {{ form.hidden_tag() }}
+    <div>
+      {{ form.ingredient.label }} {{ form.ingredient() }}
+    </div>
+    <div>
+      {{ form.size.label }} {{ form.size() }}
+    </div>
+    <button type="submit">Add Ingredient</button>
+  </form>
 {% endblock %}

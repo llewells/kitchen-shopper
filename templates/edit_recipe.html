@@ -3,39 +3,30 @@
 {% block content %}
   <h1>Edit Recipe</h1>
   <form method="POST" action="{{ url_for('update_recipe', recipe_id=recipe.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ form.csrf_token }}
     <label for="name">Name:</label>
-    <input type="text" id="name" name="name" value="{{ recipe.name }}" required>
+    {{ form.name(required=True) }}
     <br>
     <label for="instructions">Instructions:</label>
-    <textarea id="instructions" name="instructions" rows="5" required>{{ recipe.instructions|join('\n') }}</textarea>
+    {{ form.instructions(required=True) }}
     <br>
     <label for="ingredients">Ingredients:</label>
     <ul>
       {% for recipe_ingredient in recipe.recipe_ingredients %}
         <li>
-          <input type="hidden" name="recipe_ingredients[{{ loop.index0 }}][id]" value="{{ recipe_ingredient.id }}">
-          <select name="recipe_ingredients[{{ loop.index0 }}][ingredient_id]" required>
-            {% for ingredient in ingredients %}
-              <option value="{{ ingredient.id }}" {% if recipe_ingredient.ingredient_id == ingredient.id %}selected{% endif %}>{{ ingredient.name }}</option>
-            {% endfor %}
-          </select>
-          <input type="text" name="recipe_ingredients[{{ loop.index0 }}][size]" value="{{ recipe_ingredient.size }}" required>
+          {{ form.recipe_ingredients[loop.index0].id() }}
+          {{ form.recipe_ingredients[loop.index0].ingredient_id(required=True) }}
+          {{ form.recipe_ingredients[loop.index0].size(required=True) }}
         </li>
       {% endfor %}
       <li>
-        <select name="new_recipe_ingredients[0][ingredient_id]">
-          <option value="">-- Select Ingredient --</option>
-          {% for ingredient in ingredients %}
-            <option value="{{ ingredient.id }}">{{ ingredient.name }}</option>
-          {% endfor %}
-        </select>
-        <input type="text" name="new_recipe_ingredients[0][size]" placeholder="Amount">
+        {{ form.new_recipe_ingredients[0].ingredient_id() }}
+        {{ form.new_recipe_ingredients[0].size() }}
       </li>
     </ul>
     <button type="button" id="add-ingredient">Add Ingredient</button>
     <br><br>
-    <button type="submit">Save Changes</button>
+    {{ form.submit() }}
   </form>
 {% endblock %}
 
@@ -47,13 +38,8 @@
       const ul = document.querySelector('ul');
       const li = document.createElement('li');
       li.innerHTML = `
-        <select name="new_recipe_ingredients[${count}][ingredient_id]">
-          <option value="">-- Select Ingredient --</option>
-          {% for ingredient in ingredients %}
-            <option value="{{ ingredient.id }}">{{ ingredient.name }}</option>
-          {% endfor %}
-        </select>
-        <input type="text" name="new_recipe_ingredients[${count}][size]" placeholder="Amount">
+        {{ form.new_recipe_ingredients[count].ingredient_id() }}
+        {{ form.new_recipe_ingredients[count].size() }}
       `;
       ul.appendChild(li);
       count++;

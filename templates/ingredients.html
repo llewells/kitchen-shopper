@@ -3,10 +3,18 @@
 {% block title %}All Ingredients{% endblock %}
 
 {% block content %}
-    <h1>All Ingredients</h1>
-    <ul>
-        {% for ingredient in ingredients %}
-            <li>{{ ingredient.name }} ({{ ingredient.size }})</li>
-        {% endfor %}
-    </ul>
+  <h1>Ingredients</h1>
+  <ul>
+    {% for ingredient in ingredients %}
+      <li><a href="{{ url_for('get_ingredient', ingredient_id=ingredient.id) }}">{{ ingredient.name }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <h2>Add Ingredient</h2>
+  <form method="POST" action="{{ url_for('add_ingredient') }}">
+    {{ form.csrf_token }}
+    {{ form.name.label }} {{ form.name }}
+    {{ form.size.label }} {{ form.size }}
+    {{ form.submit }}
+  </form>
 {% endblock %}
