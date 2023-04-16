@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from models import db, Recipe, Ingredient, RecipeIngredient
 from forms import IngredientForm, RecipeForm, CreateIngredientForm, UpdateIngredientForm, UpdateRecipeForm
+import secrets
 
 # Import necessary modules from Flask-WTF
 from flask_wtf.csrf import CSRFProtect
@@ -10,6 +11,7 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///recipes.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SECRET_KEY'] = secrets.token_hex(16)
 db.init_app(app)
 
 
