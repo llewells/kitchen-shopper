@@ -128,7 +128,7 @@ def get_all_ingredients():
     ingredients = Ingredient.query.all()
 
     # # Create a new instance of IngredientForm for adding a new ingredient
-    # form = UpdateIngredientForm(obj=ingredient)
+    form = UpdateIngredientForm()
 
     # Render the ingredient data and the form using a template
     return render_template("ingredients.html", ingredients=ingredients, form=form)
