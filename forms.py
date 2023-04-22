@@ -10,11 +10,23 @@ from wtforms import (
 from wtforms.validators import DataRequired, Length, Optional
 
 
-# Create a form for creating a new ingredient
-class CreateIngredientForm(FlaskForm):
+# Create a form for ingredient
+class IngredientForm():
     name = StringField("Ingredient Name", validators=[DataRequired()])
     size = StringField("Ingredient Size", validators=[DataRequired()])
+
+
+# Create a form for creating a new ingredient
+class CreateIngredientForm(FlaskForm, IngredientForm):
     submit = SubmitField("Create Ingredient")
+
+class UpdateIngredientForm(FlaskForm, IngredientForm):
+    update = SubmitField("Update Ingredient" )
+    delete = SubmitField("Delete Ingredient" )
+
+# Define a delete form for ingredients
+class DeleteIngredientForm(FlaskForm, IngredientForm):
+    delete = SubmitField("Delete Ingredient" )
 
 
 # Create a form for creating a new recipe
@@ -26,11 +38,6 @@ class RecipeForm(FlaskForm):
     new_ingredient_size = StringField("New Ingredient Size")
 
 
-class IngredientForm(FlaskForm):
-    name = StringField("Ingredient Name", validators=[DataRequired()])
-    size = StringField("Ingredient Size", validators=[DataRequired()])
-
-
 class UpdateRecipeForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(max=100)])
     instructions = TextAreaField("Instructions", validators=[DataRequired()])
@@ -40,17 +47,6 @@ class UpdateRecipeForm(FlaskForm):
     amounts = FloatField("Amounts", validators=[DataRequired()])
 
 
-class UpdateIngredientForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    size = IntegerField("Size", validators=[Optional()])
-
-
 # Define a delete form for recipes
 class RecipeDeleteForm(FlaskForm):
     submit = SubmitField("Delete")
-
-
-# Define a delete form for ingredients
-class IngredientDeleteForm(FlaskForm):
-    submit = SubmitField("Delete")
-

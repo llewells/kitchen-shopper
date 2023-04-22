@@ -1,6 +1,12 @@
-from flask import Flask, render_template, request, jsonify
-from models import db, Recipe, Ingredient, RecipeIngredient
-from forms import IngredientForm, RecipeForm, CreateIngredientForm, UpdateIngredientForm, UpdateRecipeForm
+from flask import Flask, render_template, request
+from .models import db, Recipe, Ingredient, RecipeIngredient
+from .forms import (
+    CreateIngredientForm,
+    UpdateIngredientForm,
+    DeleteIngredientForm,
+    RecipeForm,
+    UpdateRecipeForm,
+)
 import secrets
 
 # Import necessary modules from Flask-WTF
@@ -11,7 +17,7 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///recipes.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = secrets.token_hex(16)
+app.config["SECRET_KEY"] = secrets.token_hex(16)
 db.init_app(app)
 
 
@@ -48,7 +54,9 @@ def create_recipe():
         # Loop through the ingredients data and create Ingredient and RecipeIngredient objects
         for ingredient_data in ingredients_data:
             # Check if the ingredient already exists in the database
-            ingredient = Ingredient.query.filter_by(name=ingredient_data["name"]).first()
+            ingredient = Ingredient.query.filter_by(
+                name=ingredient_data["name"]
+            ).first()
             if not ingredient:
                 # If the ingredient doesn't exist, create a new Ingredient object
                 ingredient = Ingredient(
@@ -71,7 +79,6 @@ def create_recipe():
     return render_template("create_recipe.html", form=form)
 
 
-
 # Create a new ingredient
 @app.route("/ingredients/create", methods=["GET", "POST"])
 def create_ingredient():
@@ -90,7 +97,6 @@ def create_ingredient():
         return render_template("view_ingredient.html", ingredient=new_ingredient), 201
     # Render the 'create_ingredient.html' template with the form for creating a new ingredient
     return render_template("create_ingredient.html", form=form)
-
 
 
 # Retrieve all recipes
@@ -120,8 +126,10 @@ def get_recipe(recipe_id):
 def get_all_ingredients():
     # Query the database for all Ingredient objects
     ingredients = Ingredient.query.all()
-    # Create a new instance of IngredientForm for adding a new ingredient
-    form = IngredientForm()
+
+    # # Create a new instance of IngredientForm for adding a new ingredient
+    # form = UpdateIngredientForm(obj=ingredient)
+
     # Render the ingredient data and the form using a template
     return render_template("ingredients.html", ingredients=ingredients, form=form)
 
@@ -135,30 +143,29 @@ def get_ingredient(ingredient_id):
         # If the ingredient doesn't exist, return a 404 Not Found error
         return render_template("error.html", message="Ingredient not found"), 404
     # Create an instance of the IngredientForm and populate it with the ingredient data
-    form = IngredientForm(obj=ingredient)
+    form = UpdateIngredientForm(obj=ingredient)
     # Render a template with the ingredient data and the form for editing the ingredient
     return render_template("ingredient.html", ingredient=ingredient, form=form)
 
 
-
 # Update a recipe by ID
-@app.route("/recipes/<int:recipe_id>", methods=["PUT"])
+@app.route("/recipes/edit/<int:recipe_id>", methods=["PUT"])
 def update_recipe(recipe_id):
     # Query the database for the Recipe object with the specified ID
     recipe = Recipe.query.get(recipe_id)
     if not recipe:
         # If the recipe doesn't exist, return a 404 Not Found error
         return render_template("error.html", message="Recipe not found"), 404
-    
+
     # Create a form instance with the data from the request
-    form = UpdateRecipeForm(request.form)
-    
+    form = UpdateRecipeForm(request.form, obj=recipe)
+
     if form.validate():
         # Update the recipe name if provided in the form
         recipe.name = form.name.data
         # Update the recipe instructions if provided in the form
         recipe.instructions = form.instructions.data
-        
+
         # Clear the existing ingredients for the recipe
         recipe.ingredients.clear()
         # Iterate over the ingredient data in the form
@@ -167,7 +174,10 @@ def update_recipe(recipe_id):
             ingredient = Ingredient.query.get(ingredient_data["id"])
             if not ingredient:
                 # If the ingredient doesn't exist, return a 404 Not Found error
-                return render_template("error.html", message="Ingredient not found"), 404
+                return (
+                    render_template("error.html", message="Ingredient not found"),
+                    404,
+                )
             # Create a new Recipe_Ingredient object with the specified amount
             recipe_ingredient = RecipeIngredient(
                 amount=ingredient_data["amount"], ingredient=ingredient
@@ -179,15 +189,13 @@ def update_recipe(recipe_id):
         db.session.commit()
         # Render the template with the updated recipe data
         return render_template("recipe.html", recipe=recipe)
-    
+
     # If form validation fails, render the form with the validation errors
     return render_template("edit_recipe.html", form=form, recipe=recipe), 400
 
 
-
-
-@app.route("/ingredients/<int:ingredient_id>", methods=["PUT"])
-def update_ingredient(ingredient_id):
+@app.route("/ingredients/edit/<int:ingredient_id>", methods=["GET", "POST"])
+def edit_ingredient(ingredient_id):
     # Query the database for the Ingredient object with the specified ID
     ingredient = Ingredient.query.get(ingredient_id)
     if not ingredient:
@@ -195,7 +203,7 @@ def update_ingredient(ingredient_id):
         return render_template("error.html", message="Ingredient not found"), 404
 
     # Create an instance of the form and populate it with the request data
-    form = UpdateIngredientForm(request.form)
+    form = UpdateIngredientForm(request.form, obj=ingredient)
 
     # Update the ingredient name and size if the form data is valid
     if form.validate_on_submit():
@@ -211,12 +219,12 @@ def update_ingredient(ingredient_id):
 
 
 # Deleting a recipe
-@app.route("/recipe/<int:id>", methods=["POST"])
-def delete_recipe(id):
-    recipe = Recipe.query.get(id)
+@app.route("/recipe/delete/<int:recipe_id>", methods=["POST"])
+def delete_recipe(recipe_id):
+    recipe = Recipe.query.get(recipe_id)
     if recipe:
         # Delete all associated recipe_ingredient objects
-        RecipeIngredient.query.filter_by(recipe_id=id).delete()
+        RecipeIngredient.query.filter_by(recipe_id=recipe_id).delete()
         # Delete the recipe object itself
         db.session.delete(recipe)
         db.session.commit()
@@ -227,13 +235,14 @@ def delete_recipe(id):
     else:
         return render_template("error.html", message="Recipe not found."), 404
 
+
 # Deleting an ingredient
-@app.route("/ingredient/<int:id>", methods=["POST"])
-def delete_ingredient(id):
-    ingredient = Ingredient.query.get(id)
+@app.route("/ingredient/delete/<int:ingredient_id>", methods=["POST"])
+def delete_ingredient(ingredient_id):
+    ingredient = Ingredient.query.get(ingredient_id)
     if ingredient:
         # Delete all associated recipe_ingredient objects
-        RecipeIngredient.query.filter_by(ingredient_id=id).delete()
+        RecipeIngredient.query.filter_by(ingredient_id=ingredient_id).delete()
         # Delete the ingredient object itself
         db.session.delete(ingredient)
         db.session.commit()
@@ -243,6 +252,7 @@ def delete_ingredient(id):
         )
     else:
         return render_template("error.html", message="Ingredient not found."), 404
+
 
 if __name__ == "__main__":
     app.run("localhost", port=5000)
